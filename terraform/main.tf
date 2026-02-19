@@ -52,7 +52,7 @@ module "ec2_instance_Jenkins" {
   instance_type               = "t2.medium"
   associate_public_ip_address = true
   ami                         = data.aws_ami.ubuntu22.id
-  vpc_security_group_ids      = aws_security_group.jenkins-SG.id
+  vpc_security_group_ids      = [aws_security_group.jenkins-SG.id]
   key_name                    = aws_key_pair.ci_key_pair.key_name
   monitoring                  = false
   subnet_id                   = module.vpc.public_subnets[0]
@@ -78,7 +78,7 @@ module "ec2_instance_sonar" {
   instance_type               = "t2.medium"
   associate_public_ip_address = true
   ami                         = data.aws_ami.ubuntu22.id
-  vpc_security_group_ids      = aws_security_group.sonar-SG.id
+  vpc_security_group_ids      = [aws_security_group.sonar-SG.id]
   key_name                    = aws_key_pair.ci_key_pair.key_name
   monitoring                  = false
   subnet_id                   = module.vpc.public_subnets[1]
@@ -104,10 +104,10 @@ module "ec2_instance_nexus" {
 
   instance_type          = "t2.medium"
   ami                    = data.aws_ami.amazon_linux_2.id
-  vpc_security_group_ids = aws_security_group.nexus-SG.id
+  vpc_security_group_ids = [aws_security_group.nexus-SG.id]
   key_name               = aws_key_pair.ci_key_pair.key_name
   monitoring             = false
-  subnet_id              = module.vpc.private_subnets[1]
+  subnet_id              = module.vpc.public_subnets[1]
   create_security_group  = false
 
   tags = {

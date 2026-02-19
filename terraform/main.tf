@@ -1,4 +1,5 @@
-## s
+## search for ubuntu22 ami 
+
 data "aws_ami" "ubuntu22" {
   most_recent = true
 
@@ -16,22 +17,42 @@ data "aws_ami" "ubuntu22" {
 }
 
 
+## search for aws Linux ami 
+
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  
+  owners = ["amazon"] # Official Amazon owner alias
+  
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"] # A common name pattern for Amazon Linux 2 AMIs
+  }
+  
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+  
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
 
 
 
+### EC2 Instance for Jenkins Server
 
-
-### EC2 Instance for Nginx Server
-
-module "ec2_instance_nginx" {
+module "ec2_instance_Jenkins" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
-  name = "Nginx-instance"
+  name = "Jenkins-instance"
 
   instance_type               = "t2.medium"
   associate_public_ip_address = true
   ami                         = data.aws_ami.ubuntu22.id 
-  vpc_security_group_ids      = [aws_security_group.jenkins-SG.id]
+  vpc_security_group_ids      = aws_security_group.jenkins-SG.id
   key_name                    = aws_key_pair.ci_key_pair.key_name
   monitoring                  = false
   subnet_id                   = module.vpc.public_subnets[0]
@@ -47,22 +68,21 @@ module "ec2_instance_nginx" {
 }
 
 
-### EC2 Instance for Tomcat Server
+### EC2 Instance for sonar Server
 
-module "ec2_instance_tomcat" {
+module "ec2_instance_sonar" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
-  name = "Tomcat-instance"
+  name = "sonar-instance"
 
-  instance_type               = "t2.micro"
+  instance_type               = "t2.medium"
   associate_public_ip_address = true
-  ami                         = "ami-01f79b1e4a5c64257" # eu-central-1 ubuntu 20.24.04 LTS
-  vpc_security_group_ids      = [aws_security_group.Tomcat-SG.id]
-  key_name                    = aws_key_pair.EC2_Key_Pair.key_name
+  ami                         = data.aws_ami.ubuntu22.id
+  vpc_security_group_ids      = aws_security_group.sonar-SG.id
+  key_name                    = aws_key_pair.ci_key_pair.key_name
   monitoring                  = false
   subnet_id                   = module.vpc.public_subnets[1]
   create_security_group       = false
-  iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
 
 
   tags = {
@@ -75,17 +95,17 @@ module "ec2_instance_tomcat" {
 }
 
 
-#### EC2 Instance for rappitmq Server
+#### EC2 Instance for nexus Server
 
-module "ec2_instance_rabbitmq" {
+module "ec2_instance_nexus" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
-  name = "RabbitMQ-instance"
+  name = "nexus-instance"
 
-  instance_type          = "t2.micro"
-  ami                    = "ami-0191d47ba10441f0b" # eu-central-1 AWS Linux 2
-  vpc_security_group_ids = [aws_security_group.Data-SG.id]
-  key_name               = aws_key_pair.EC2_Key_Pair.key_name
+  instance_type          = "t2.medium"
+  ami                    =  data.aws_ami.amazon_linux_2.id
+  vpc_security_group_ids = aws_security_group.nexus-SG.id
+  key_name               = aws_key_pair.ci_key_pair.key_name
   monitoring             = false
   subnet_id              = module.vpc.private_subnets[1]
   create_security_group  = false

@@ -4,8 +4,8 @@ module "vpc" {
   name = var.VPC_Name
   cidr = var.VPC_CIDR
 
-  azs             = [var.AWS_Zone-a, var.AWS_Zone-b, var.AWS_Zone-c]
-  public_subnets  = var.Public_Subnet_CIDR
+  azs            = [var.AWS_Zone-a, var.AWS_Zone-b, var.AWS_Zone-c]
+  public_subnets = var.Public_Subnet_CIDR
 
 
   enable_vpn_gateway      = false

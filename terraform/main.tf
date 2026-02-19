@@ -21,19 +21,19 @@ data "aws_ami" "ubuntu22" {
 
 data "aws_ami" "amazon_linux_2" {
   most_recent = true
-  
+
   owners = ["amazon"] # Official Amazon owner alias
-  
+
   filter {
     name   = "name"
     values = ["amzn2-ami-hvm-*-x86_64-gp2"] # A common name pattern for Amazon Linux 2 AMIs
   }
-  
+
   filter {
     name   = "architecture"
     values = ["x86_64"]
   }
-  
+
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
@@ -51,7 +51,7 @@ module "ec2_instance_Jenkins" {
 
   instance_type               = "t2.medium"
   associate_public_ip_address = true
-  ami                         = data.aws_ami.ubuntu22.id 
+  ami                         = data.aws_ami.ubuntu22.id
   vpc_security_group_ids      = aws_security_group.jenkins-SG.id
   key_name                    = aws_key_pair.ci_key_pair.key_name
   monitoring                  = false
@@ -63,7 +63,7 @@ module "ec2_instance_Jenkins" {
     Environment = "dev"
   }
 
-  user_data = file("../userdata-EC2/nginx.sh")
+  user_data = file("../userdata-EC2/jenkins.sh")
 
 }
 
@@ -90,7 +90,7 @@ module "ec2_instance_sonar" {
     Environment = "dev"
   }
 
-  user_data = file("../userdata-EC2/tomcat_ubuntu.sh")
+  user_data = file("../userdata-EC2/sonar.sh")
 
 }
 
@@ -103,7 +103,7 @@ module "ec2_instance_nexus" {
   name = "nexus-instance"
 
   instance_type          = "t2.medium"
-  ami                    =  data.aws_ami.amazon_linux_2.id
+  ami                    = data.aws_ami.amazon_linux_2.id
   vpc_security_group_ids = aws_security_group.nexus-SG.id
   key_name               = aws_key_pair.ci_key_pair.key_name
   monitoring             = false
@@ -115,6 +115,6 @@ module "ec2_instance_nexus" {
     Environment = "dev"
   }
 
-  user_data = file("../userdata-EC2/rabbitmq.sh")
+  user_data = file("../userdata-EC2/nexus.sh")
 
 }
